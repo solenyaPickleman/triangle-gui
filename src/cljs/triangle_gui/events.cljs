@@ -8,3 +8,18 @@
  ::initialize-db
  (fn [_ _]
    db/default-db))
+
+
+(defn handle-next-turn                          ;; maybe choose a better name like `delete-item`
+  [coeffects event]                               ;; `coeffects` holds the current state of the world.
+  (let [pegs (second event)                    ;; extract id from event vector
+        db      (:db coeffects)]                  ;; extract the current application state
+    (js/console.log pegs db event)
+    {:db (assoc db :pegs-remaining (dec pegs))}
+
+    ))
+
+(re-frame/reg-event-fx
+  :next-turn
+  handle-next-turn
+  )
