@@ -5,7 +5,6 @@
    [triangle-gui.events :as events]
    [triangle-gui.views :as views]
    [triangle-gui.config :as config]
-   [garden.core :refer [css]]
    ))
 
 
@@ -23,4 +22,6 @@
   (re-frame/dispatch-sync [::events/initialize-db])
   (dev-setup)
   (mount-root))
+
+(set! (. js/document -title) "Triangle Game Solver")
 
