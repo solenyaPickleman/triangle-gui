@@ -25,10 +25,29 @@
                  [:span {:style {:margin-left "33%"  :color "#B2DFDB"}}
                   "Beat the Cracker Barrel Triangle Game ... with one try"]   ]
                 ])
-(defn main-interface []
-  [:div  {:style {:background-color "#FFFFFF" :height "75%" :width "100%"}} [:div "Main Game Interface ... "] [:div "Main Game Interface ... "]]
 
+
+(defn build-game [game]
+  (->> game
+       (map #(repeat (count %) [:img {:src "wdot.png" :alt "broken dot" :height "10%" :width "10%"}]))
+       (map #( into [:div
+                     {:style
+                      {:margin-left (clojure.string/join "" [(str (- 50 (* 5  (dec (count %))))) "%"])
+                      :margin-right (clojure.string/join "" ["-" (str (- 50 (* 5  (dec (count %))))) "%"])}
+                      }] %))
+  ))
+
+
+(defn main-interface []
+  (let [game @(re-frame/subscribe [::subs/game])]
+
+    [:div {:style {:background-color "whitesmoke" :height "75%" :width "100%"}}
+     [:div
+      (build-game game)
+      ]]
+    )
   )
+
 (defn main-panel []
   [:div {:style {:background-color "#009688" :width "100%" :height "75%" :margin 0}}
    [title-bar]

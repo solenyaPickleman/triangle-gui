@@ -22,7 +22,7 @@
 
   :profiles
   {:dev
-   {:dependencies [[binaryage/devtools "0.9.10"]]
+   {:dependencies [[binaryage/devtools "0.9.10"] [day8.re-frame/re-frame-10x "0.3.7-react16"]]
 
     :plugins      [[lein-figwheel "0.5.16"]]}
    :prod { }
@@ -38,7 +38,8 @@
                     :output-dir           "resources/public/js/compiled/out"
                     :asset-path           "js/compiled/out"
                     :source-map-timestamp true
-                    :preloads             [devtools.preload]
+                    :closure-defines      {"re_frame.trace.trace_enabled_QMARK_" true}
+                    :preloads             [day8.re-frame-10x.preload]
                     :external-config      {:devtools/config {:features-to-install :all}}
                     }}
 
@@ -46,8 +47,8 @@
      :source-paths ["src/cljs"]
      :compiler     {:main            triangle-gui.core
                     :output-to       "resources/public/js/compiled/app.js"
-                    :optimizations   :advanced
-                    :closure-defines {goog.DEBUG false}
+                    :optimizations   :none
+                    :closure-defines {goog.DEBUG true}
                     :pretty-print    false}}
 
 
