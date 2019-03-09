@@ -27,20 +27,36 @@
                 ])
 
 
-(defn build-game [game]
-  (->> game
-       (map #(repeat (count %) [:img {:src "wdot.png" :alt "broken dot" :height "10%" :width "10%"}]))
-       (map #( into [:div
-                     {:style
-                      {:margin-left (clojure.string/join "" [(str (- 50 (* 5  (dec (count %))))) "%"])
-                      :margin-right (clojure.string/join "" ["-" (str (- 50 (* 5  (dec (count %))))) "%"])}
-                      }] %))
-  ))
+;build image .. either an empty space or a space filled with a peg
+(defn get-image [data imageindex]
 
+  (loop [images [] d data ]
+    (if (= (count images) (count data))
+      images
+      (let [i (swap! imageindex inc)]
+      (recur (conj images (if (= (first d) 0)
+                             [:img {:on-click #(re-frame.core/dispatch [:set-open-peg i]) :src "wdotempty.png" :alt "broken dot" :height "10%" :width "10%"}]
+                             [:img {:on-click #(re-frame.core/dispatch [:set-open-peg i]) :src "wdot.png" :alt "broken dot" :height "10%" :width "10%"}]
+                             ))
+             (rest d)
+             ))))
+  )
+
+;build the game board.. define if
+(defn build-game [game]
+  (let [keyindex (atom 0)  imageindex (atom -1)]
+    (->> game
+         (map #(get-image % imageindex))
+         (map #(into [:div
+                      {:key (swap! keyindex inc) :style
+                            {:margin-left  (clojure.string/join "" [(str (- 50 (* 5 (dec (count %))))) "%"])
+                             :margin-right (clojure.string/join "" ["-" (str (- 50 (* 5 (dec (count %))))) "%"])}
+                       }] %))
+         ))
+  )
 
 (defn main-interface []
   (let [game @(re-frame/subscribe [::subs/game])]
-
     [:div {:style {:background-color "whitesmoke" :height "75%" :width "100%"}}
      [:div
       (build-game game)
