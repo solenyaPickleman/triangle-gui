@@ -49,8 +49,8 @@
          (map #(get-image % imageindex))
          (map #(into [:div
                       {:key (swap! keyindex inc) :style
-                            {:margin-left  (clojure.string/join "" [(str (- 50 (* 5 (dec (count %))))) "%"])
-                             :margin-right (clojure.string/join "" ["-" (str (- 50 (* 5 (dec (count %))))) "%"])}
+                            {:margin-left  (clojure.string/join "" [(str (- 40 (* 5 (dec (count %))))) "%"])
+                             :margin-right (clojure.string/join "" ["-" (str (- 40 (* 5 (dec (count %))))) "%"])}
                        }] %))
          ))
   )
