@@ -42,7 +42,6 @@
   [coeffects event]
   (let [i (second event)                    ;; extract id from event vector
         db (:db coeffects)]               ;; extract the current application state
-    (js/console.log i (split-tree (into [] (map #(get-peg (= % i)) (range 15)))))
     {:db (assoc db :game (split-tree (into [] (map #(get-peg (= % i)) (range 15)))))}
     ))
 

@@ -25,3 +25,4 @@
 
 (set! (. js/document -title) "Triangle Game Solver")
 
+
