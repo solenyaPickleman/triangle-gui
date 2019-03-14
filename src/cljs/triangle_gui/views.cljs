@@ -34,9 +34,9 @@
     (if (= (count images) (count data))
       images
       (let [i (swap! imageindex inc)]
-      (recur (conj images (if (= (first d) 0)
-                             [:img {:on-click #(re-frame.core/dispatch [:set-open-peg i]) :src "wdotempty.png" :alt "broken dot" :height "10%" :width "10%"}]
-                             [:img {:on-click #(re-frame.core/dispatch [:set-open-peg i]) :src "wdot.png" :alt "broken dot" :height "10%" :width "10%"}]
+          (recur (conj images (if (= (first d) 0)
+                             [:img {:on-click #(re-frame.core/dispatch [:set-open-peg i]) :src "empty.png" :alt "broken dot" :height "10%" :width "10%"}]
+                             [:img {:on-click #(re-frame.core/dispatch [:set-open-peg i]) :src "dot.png" :alt "broken dot" :height "10%" :width "10%"}]
                              ))
              (rest d)
              ))))
@@ -45,21 +45,21 @@
 ;build the game board.. define if
 (defn build-game [game]
   (let [keyindex (atom 0)  imageindex (atom -1)]
-    (->> game
-         (map #(get-image % imageindex))
-         (map #(into [:div
-                      {:key (swap! keyindex inc) :style
-                            {:margin-left  (clojure.string/join "" [(str (- 40 (* 5 (dec (count %))))) "%"])
-                             :margin-right (clojure.string/join "" ["-" (str (- 40 (* 5 (dec (count %))))) "%"])}
-                       }] %))
-         ))
+    (as-> game g
+         (map #(get-image % imageindex) g)
+          (map #(into [:div {:key (swap! keyindex inc) :style { :display "flex" :justify-content "center" :margin-bottom "-3%" :transform "scale(0.7, 0.7)"} }] %) g)
+          (into '[] g)
+          ))
   )
 
 (defn main-interface []
   (let [game @(re-frame/subscribe [::subs/game])]
     [:div {:style {:background-color "whitesmoke" :height "75%" :width "100%"}}
      [:div
-      (build-game game)
+      (let [data (build-game game)]
+        ;(vec (butlast data))
+        (sort-by #(get-in % [1 :key]) <  (conj  (butlast data) (assoc-in (last data) [1 :style :margin-bottom] "0%") ))
+        )
       ]]
     )
   )
