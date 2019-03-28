@@ -72,8 +72,7 @@
       ;replace current row with future rows
       (loop [moves movelist  new_games []]
         (if (empty? moves)
-          (do  (print "new games" new_games)
-               new_games)
+          new_games
           (recur
             (subvec (vec moves) 1)
             (conj new_games
@@ -112,7 +111,8 @@
                                                  (nth g (nth % 2))))))
                                                   movelist)
                  new_games []]
-            (if (zero? 0)
+            (print "moves" moves)
+            (if (empty? moves)
               new_games
               (recur (rest moves) (conj new_games (split-tree (into []
                                                                       (assoc
@@ -150,7 +150,7 @@
                                              (nth g (nth % 2))))))
                            movelist)
              new_games []]
-        (if (zero? 0)
+        (if (empty? moves)
           new_games
           (recur (rest moves) (conj new_games (split-tree (into []
                                                                   (assoc
@@ -187,7 +187,7 @@
 (defn beat-game "take a game, return the solved state"
   [game]
   (let [tree (clojure.zip/zipper branch get-moves clojure.zip/make-node game)]
-    (print "hello"  (get-moves game))
+    (print "caller"  (get-moves game))
     tree))
 
 
