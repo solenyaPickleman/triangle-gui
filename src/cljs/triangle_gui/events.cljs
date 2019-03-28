@@ -2,6 +2,7 @@
   (:require
    [re-frame.core :as re-frame]
    [triangle-gui.db :as db]
+   [clojure.zip :as zip]
    ))
 
 (re-frame/reg-event-db
@@ -50,36 +51,36 @@
 ;make moves - gets all potential game boards
 (defn get-moves-samerow "given a hole, row, and game board, returns all moves on the same row. Moves are returned as possible game boards"
   [hole row game]
+  (print "row " row)
   (if (< row 2)
     '[]
     (let
-      [left-move (if (< (which-element-in-row hole) 2) '[] (subvec (nth game row) (- (which-element-in-row hole) 2) (+ 1 (which-element-in-row hole))))
-       right-move (if (> (+ 2 (which-element-in-row hole)) row) '[] (subvec (nth game row) (which-element-in-row hole) (+ 3 (which-element-in-row hole))))
-       movelist (map #(and (= 2 (reduce + %)) (= 3 (count %))) (list left-move right-move))
+      [left-move (if (< (which-element-in-row hole) 2)
+          (nth game row)
+          (vec (concat
+            (subvec  (nth game row) 0 (- (which-element-in-row hole) 2))
+            (map #(if (zero? %) 1 0) (subvec  (nth game row) (- (which-element-in-row hole) 2)  (+ 1 (which-element-in-row hole))))
+            (subvec  (nth game row) (+ 1 (which-element-in-row hole))))))
+       right-move (if (> (+ 2 (which-element-in-row hole)) row)
+                    (nth game row)
+                    (vec (concat
+                      (subvec  (nth game row) 0 (which-element-in-row hole))
+                      (map #(if (zero? %) 1 0) (subvec  (nth game row) (which-element-in-row hole) (+ 3 (which-element-in-row hole))))
+                      (subvec  (nth game row) (+ 3 (which-element-in-row hole))))))
+       movelist (filter #(<  (reduce + %) (reduce + (nth game row)))  (list left-move right-move))
        ]
-      ;replace current row with possible future rows
-      ;cast to string, substring replace with all possible options
-      (loop [moves movelist
-             left true
-             new_games []]
+      ;replace current row with future rows
+      (loop [moves movelist  new_games []]
         (if (empty? moves)
-          (into [] (filter #(not (nil? %)) new_games))
+          (do  (print "new games" new_games)
+               new_games)
           (recur
-            (subvec moves 1)
-            false
-            (conj new_games (if (not (first moves))
-                              nil
-                              (split-tree (into [] (flatten (conj
-                                                              (subvec game 0 row)
-                                                              (let [r (nth game row)
-                                                                    start (if left (- (which-element-in-row hole) 2) (which-element-in-row hole))
-                                                                    end (if left (which-element-in-row hole) (+ 3 (which-element-in-row hole)))
-                                                                    ]
-                                                                (into [] (flatten (conj
-                                                                                    (subvec r 0 start)
-                                                                                    (into [] (map #(if (zero? %) 1 0) (subvec r start end)))
-                                                                                    (subvec r end)))))
-                                                              (subvec game (+ row 1))))))))))))))
+            (subvec (vec moves) 1)
+            (conj new_games
+                    (if ( = row 4)
+                      (into [] (concat (subvec game 0 row) [(nth moves 0)]))
+                      [(subvec game 0 row) (vec (first moves)) (subvec game (inc row))]
+                  ))))))))
 
 (defn get-moves-above "given a hole, row, and game board, returns all moves from above the row. Moves are returned as possible game boards"
   [hole row game]
@@ -157,14 +158,46 @@
                                                                     (nth (first moves) 2) 0)
                                                                   )))))))))
 
+(defn get-moves-for-hole "given a game board and specific hole, give all possible moves for that peg"
+  [hole game]
+  (into  [] (concat
+    (get-moves-above hole (which-row hole) game)
+    (get-moves-samerow hole (which-row hole) game)
+    (get-moves-below hole (which-row hole) game)
+    )))
+
+(defn get-moves "given a game board, gives all possible moves in the form of the potential game board"
+  [game]
+   (loop [index 0 moves []]
+     (if (= index (count (flatten game)))
+       (vec moves)                                           ;at this point ,all have been looped through so return the vector of potential game boards
+       (recur
+         (+ index 1)
+         (if (= (nth (flatten game) index) 1)
+           moves
+           (into [] (concat moves (get-moves-for-hole index game)))
+           )))))
+
+
+(defn branch "zipper branching function"
+  [game]
+  (any? (map #(  > (reduce + (flatten game)) (reduce + (flatten  %))  ) (get-moves game))))
+
+
+(defn beat-game "take a game, return the solved state"
+  [game]
+  (let [tree (clojure.zip/zipper branch get-moves clojure.zip/make-node game)]
+    (print "hello"  (get-moves game))
+    tree))
+
 
 
 (defn handle-next-turn
   [coeffects event]                               ;; co-effects holds the current state of the world.
   (let [pegs (second event)                    ;; extract # of pegs from event vector
         db      (:db coeffects)]                  ;; extract the current application state
-    (js/console.log pegs db event )
-    {:db (assoc db :pegs-remaining (dec pegs))}
+    (print (beat-game (:game db)) )
+    {:db (assoc db :test (beat-game (:game db)))}
     ))
 
 (re-frame/reg-event-fx
