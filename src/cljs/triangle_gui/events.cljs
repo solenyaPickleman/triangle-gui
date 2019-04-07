@@ -3,6 +3,7 @@
    [re-frame.core :as re-frame]
    [triangle-gui.db :as db]
    [clojure.zip :as zip]
+   [clojure.data.zip :as zipfunc]
    ))
 
 (re-frame/reg-event-db
@@ -51,7 +52,6 @@
 ;make moves - gets all potential game boards
 (defn get-moves-samerow "given a hole, row, and game board, returns all moves on the same row. Moves are returned as possible game boards"
   [hole row game]
-  (print "row " row)
   (if (< row 2)
     '[]
     (let
@@ -61,7 +61,7 @@
             (subvec  (nth game row) 0 (- (which-element-in-row hole) 2))
             (map #(if (zero? %) 1 0) (subvec  (nth game row) (- (which-element-in-row hole) 2)  (+ 1 (which-element-in-row hole))))
             (subvec  (nth game row) (+ 1 (which-element-in-row hole))))))
-       right-move (if (> (+ 2 (which-element-in-row hole)) row)
+       right-move (if (>= (+ 2 (which-element-in-row hole)) row)
                     (nth game row)
                     (vec (concat
                       (subvec  (nth game row) 0 (which-element-in-row hole))
@@ -111,7 +111,6 @@
                                                  (nth g (nth % 2))))))
                                                   movelist)
                  new_games []]
-            (print "moves" moves)
             (if (empty? moves)
               new_games
               (recur (rest moves) (conj new_games (split-tree (into []
@@ -161,9 +160,9 @@
 (defn get-moves-for-hole "given a game board and specific hole, give all possible moves for that peg"
   [hole game]
   (into  [] (concat
-    (get-moves-above hole (which-row hole) game)
-    (get-moves-samerow hole (which-row hole) game)
-    (get-moves-below hole (which-row hole) game)
+    (get-moves-above hole (which-row hole) (split-tree  (vec (flatten game))))
+    (get-moves-samerow hole (which-row hole) (split-tree (vec (flatten game))))
+    (get-moves-below hole (which-row hole) (split-tree (vec (flatten game))))
     )))
 
 (defn get-moves "given a game board, gives all possible moves in the form of the potential game board"
@@ -178,17 +177,29 @@
            (into [] (concat moves (get-moves-for-hole index game)))
            )))))
 
-
 (defn branch "zipper branching function"
   [game]
-  (any? (map #(  > (reduce + (flatten game)) (reduce + (flatten  %))  ) (get-moves game))))
+  (and (some? (map #(= 1 (reduce + (flatten %))) (get-moves game)))
+       (some? (map #(  > (reduce + (flatten game)) (reduce + (flatten  %))  ) (get-moves game)))
 
+
+       ))
 
 (defn beat-game "take a game, return the solved state"
   [game]
-  (let [tree (clojure.zip/zipper branch get-moves clojure.zip/make-node game)]
-    (print "caller"  (get-moves game))
-    tree))
+  ;(let [tree (filter #(clojure.zip/end? %) (zipfunc/descendants (clojure.zip/zipper branch get-moves clojure.zip/make-node game)))]
+  ;  (print tree)
+  ;  tree))
+
+
+  (loop [tree (zipfunc/descendants (clojure.zip/zipper branch get-moves clojure.zip/make-node game))]
+    (let [x (next tree)]
+    (if (= 3 (reduce + (flatten (next tree))))
+      (do (print (zip/node tree))
+        (zip/node tree))
+      (recur (next tree))
+      )
+    )))
 
 
 
