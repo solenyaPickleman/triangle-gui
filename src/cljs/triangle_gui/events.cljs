@@ -169,7 +169,7 @@
   [game]
    (loop [index 0 moves []]
      (if (= index (count (flatten game)))
-       (vec moves)                                           ;at this point ,all have been looped through so return the vector of potential game boards
+       (vec (filter #(> (reduce + (flatten game)) (reduce + (flatten %))) moves))  ;at this point ,all have been looped through so return the vector of valid potential game boards
        (recur
          (+ index 1)
          (if (= (nth (flatten game) index) 1)
@@ -179,27 +179,25 @@
 
 (defn branch "zipper branching function"
   [game]
-  (and (some? (map #(= 1 (reduce + (flatten %))) (get-moves game)))
-       (some? (map #(  > (reduce + (flatten game)) (reduce + (flatten  %))  ) (get-moves game)))
-
-
-       ))
+  (let [newgames (get-moves game)]
+    (some? (map #( = 1 (reduce + (flatten %))) newgames))))
 
 (defn beat-game "take a game, return the solved state"
   [game]
   ;(let [tree (filter #(clojure.zip/end? %) (zipfunc/descendants (clojure.zip/zipper branch get-moves clojure.zip/make-node game)))]
   ;  (print tree)
   ;  tree))
-
-
-  (loop [tree (zipfunc/descendants (clojure.zip/zipper branch get-moves clojure.zip/make-node game))]
-    (let [x (next tree)]
-    (if (= 3 (reduce + (flatten (next tree))))
+  (print game "Hello")
+  (def tree (zipfunc/descendants (clojure.zip/zipper branch get-moves clojure.zip/make-node game)))
+  (print tree)
+  (loop [x tree]
+    (if (= 5 (reduce + (flatten x )))
       (do (print (zip/node tree))
         (zip/node tree))
-      (recur (next tree))
+      (do (print (reduce + (flatten x)))
+          (recur (next x)))
       )
-    )))
+    ))
 
 
 
