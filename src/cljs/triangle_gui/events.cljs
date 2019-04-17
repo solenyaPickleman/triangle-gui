@@ -2,7 +2,6 @@
   (:require
   [re-frame.core :as re-frame]
   [triangle-gui.db :as db]
-  [cljs-node-io.core :as io :refer [slurp spit]]
   ))
 
 

@@ -3,8 +3,7 @@
                  [org.clojure/clojurescript "1.10.520"]
                  [reagent "0.8.1"]
                  [re-frame "0.10.6"]
-                 [garden "1.3.6"]
-                 [cljs-node-io "1.1.2"]]
+                 [garden "1.3.6"]]
 
   :plugins [[lein-cljsbuild "1.1.7"]
             [lein-ancient "0.6.15"]
