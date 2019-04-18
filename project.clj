@@ -49,7 +49,6 @@
      :figwheel     {:on-jsload "triangle-gui.core/mount-root"}
      :compiler     {:main            triangle-gui.core
                     :output-to       "resources/public/js/compiled/app.js"
-                    :output-dir           "resources/public/js/compiled/out"
                     :asset-path           "js/compiled/out"
                     :optimizations   :none
                     :closure-defines {goog.DEBUG true}
