@@ -1,0 +1,16 @@
+ * Serving Flask app "server" (lazy loading)
+ * Environment: production
+   WARNING: Do not use the development server in a production environment.
+   Use a production WSGI server instead.
+ * Debug mode: off
+ * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
+127.0.0.1 - - [18/Apr/2019 01:18:54] "GET /api/011111111111111 HTTP/1.0" 200 -
+127.0.0.1 - - [18/Apr/2019 01:18:59] "GET /api/011111111111111 HTTP/1.0" 200 -
+127.0.0.1 - - [18/Apr/2019 01:19:17] "GET /api/011111111111111 HTTP/1.0" 200 -
+127.0.0.1 - - [18/Apr/2019 01:19:23] "GET /api/111110111111111 HTTP/1.0" 200 -
+127.0.0.1 - - [18/Apr/2019 01:19:59] "GET /api/011111111111111 HTTP/1.0" 200 -
+127.0.0.1 - - [18/Apr/2019 01:21:08] "GET /api/111011111111111 HTTP/1.0" 200 -
+127.0.0.1 - - [18/Apr/2019 01:21:19] "GET /api/011111111111111 HTTP/1.0" 200 -
+127.0.0.1 - - [18/Apr/2019 01:24:09] "GET /api/011111111111111 HTTP/1.0" 200 -
+127.0.0.1 - - [18/Apr/2019 01:26:04] "GET /api/011111111111111 HTTP/1.0" 200 -
+127.0.0.1 - - [18/Apr/2019 01:26:09] "GET /api/111111101111111 HTTP/1.0" 200 -

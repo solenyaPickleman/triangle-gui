@@ -15,7 +15,7 @@
 
 (defn make-remote-call [game]
       (js/console.log "making call")
-      (go (process-solutions  (async/<! (http/get (str "http://localhost:5000/" (clojure.string/join "" (flatten game))){:with-credentials? false})))))
+      (go (process-solutions  (async/<! (http/get (str "http://solvethepeggame.com/api/" (clojure.string/join "" (flatten game))){:with-credentials? false})))))
 
 
 (re-frame/reg-event-db

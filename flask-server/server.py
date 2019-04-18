@@ -12,7 +12,7 @@ games =  re.findall("\[[0-2\" ]+\]", dat)
 games = [json.loads(x.replace(' ',',')) for x in games]
 
 #returns A solved game
-@app.route("/<game>", methods=["GET"])
+@app.route("/api/<game>", methods=["GET"])
 def get_edn(game):
     print("input game: " , game)
     possible_games = [x for x in games if x[0] == game]
